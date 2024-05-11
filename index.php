@@ -1,16 +1,60 @@
 <?php
-// Include Google API Client Library
-require __DIR__ . '/vendor/autoload.php';
-
 // Initialize the session
 session_start();
 
+// Check if form is submitted for client secret file upload
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["upload_client_secret"])) {
+    // Check if file was uploaded without errors
+    if (isset($_FILES["client_secret_file"]) && $_FILES["client_secret_file"]["error"] == 0) {
+        $target_dir = "uploads/";
+        $target_file = $target_dir . basename($_FILES["client_secret_file"]["name"]);
+        $uploadOk = 1;
+        $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+        // Check if file already exists
+        if (file_exists($target_file)) {
+            echo "Sorry, file already exists.";
+            $uploadOk = 0;
+        }
+
+        // Allow only JSON files
+        if ($fileType != "json") {
+            echo "Sorry, only JSON files are allowed.";
+            $uploadOk = 0;
+        }
+
+        // Check if $uploadOk is set to 0 by an error
+        if ($uploadOk == 0) {
+            echo "Sorry, your file was not uploaded.";
+        } else {
+            if (move_uploaded_file($_FILES["client_secret_file"]["tmp_name"], $target_file)) {
+                $_SESSION['client_secret_path'] = $target_file;
+                echo "The file " . htmlspecialchars(basename($_FILES["client_secret_file"]["name"])) . " has been uploaded.";
+            } else {
+                echo "Sorry, there was an error uploading your file.";
+            }
+        }
+    }
+}
+
+// If client secret file is not uploaded or invalid, ask for it
+if (!isset($_SESSION['client_secret_path']) || !file_exists($_SESSION['client_secret_path'])) {
+    echo "<form method='post' action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' enctype='multipart/form-data'>";
+    echo "Please upload your client secret JSON file: <input type='file' name='client_secret_file' required>";
+    echo "<input type='submit' name='upload_client_secret' value='Upload'>";
+    echo "</form>";
+    exit;
+}
+
+// Include Google API Client Library
+require __DIR__ . '/vendor/autoload.php';
+
 // Initialize the Google Client
 $client = new Google_Client();
-$client->setAuthConfig('client_secret.json'); // Path to your client secret JSON file
+$client->setAuthConfig($_SESSION['client_secret_path']); // Path to client secret JSON file
 $client->setAccessType('offline'); // Allow for offline access
 $client->addScope(Google_Service_Calendar::CALENDAR);
-$client->setRedirectUri('urn:ietf:wg:oauth:2.0:oob');
+$client->setRedirectUri('urn:ietf:wg:oauth:2.0:oob'); // Set redirect URI to "urn:ietf:wg:oauth:2.0:oob"
 
 // If user is not authenticated, redirect to Google OAuth consent screen
 if (!isset($_SESSION['access_token'])) {

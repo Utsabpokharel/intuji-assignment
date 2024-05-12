@@ -58,7 +58,7 @@ $events = $service->events->listEvents('primary');
                                 <td><?= ($eventEndDate->format('Y-m-d')) . ' ' . ($eventEndDate->format('H:i:s')) ?></td>
                                 <td><?= ($event->location) ?></td>
                                 <td><?= ($event->description) ?></td>
-                                <td><a href='?action=delete&event_id=<?= $event->id ?>' style="text-decoration: none;">Delete</a> </td>
+                                <td><a href='?action=delete&event_id=<?= $event->id ?>' style="text-decoration: none;" class="btn btn-sm btn-danger">Delete</a> </td>
                             </tr>
 
                         <?php

@@ -3,9 +3,24 @@ session_start();
 require_once 'vendor/autoload.php'; // Include Google API PHP Client Library
 
 $client = new Google_Client();
-$client->setAuthConfig('client_secret.json');
-$client->addScope(Google_Service_Calendar::CALENDAR);
-$client->setRedirectUri('http://localhost/intuji/callback.php');
+// $client->setAuthConfig('client_secret.json');
+// $client->addScope(Google_Service_Calendar::CALENDAR);
+// $client->setRedirectUri('http://localhost/intuji/callback.php');
+// if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['client_secret_file'])) {
+//     // Handle file upload
+//     $uploadDir = __DIR__ . '/uploads/';
+//     $uploadFile = $uploadDir . basename($_FILES['client_secret_file']['name']);
+
+//     if (move_uploaded_file($_FILES['client_secret_file']['tmp_name'], $uploadFile)) {
+//         // File uploaded successfully, set auth config
+//         $client->setAuthConfig($uploadFile);
+//         $client->addScope(Google_Service_Calendar::CALENDAR);
+//         $redirectUri = 'http://' . $_SERVER['HTTP_HOST'] . '/intuji/callback.php';
+//         $client->setRedirectUri($redirectUri);
+//     } else {
+//         echo "Error uploading file.";
+//     }
+// }
 
 if (!isset($_SESSION['access_token']) || !$_SESSION['access_token']) {
     header('Location: index.php');
